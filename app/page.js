@@ -1,10 +1,13 @@
 'use client';
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import {firestone} from "../firebase";
+import {firestore} from "@/firebase";
+import { Box, Typography } from "@mui/material";
 
 export default function Home() {
   return (
-    <>Hello World</>
+    <Box>
+      <Typography variant h1>Inventory app</Typography>
+    </Box>
   );
 }
