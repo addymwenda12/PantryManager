@@ -23,6 +23,13 @@ export default function RemoveItem() {
   };
 
   return (
-    <RemoveItemForm setItemId={setItemId} handleRemoveItem={handleRemoveItem} />
+    <div>
+      <h2>Remove Item</h2>
+      <RemoveItemForm
+        setItemId={setItemId}
+        handleRemoveItem={handleRemoveItem}
+      />
+      {message && <p>{message}</p>}
+    </div>
   );
 }
