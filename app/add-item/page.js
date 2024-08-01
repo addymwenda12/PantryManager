@@ -7,6 +7,7 @@ import { useHistory } from "react-router-dom";
 
 /* ADD PANTRY ITEM */
 export default function AddItem() {
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
