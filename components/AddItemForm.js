@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@mui/material";
 
-const AddItemForm = ({ onaddItem }) => {
+const AddItemForm = ({ onAddItem }) => {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onaddItem({ name, quantity, expiryDate });
+    onAddItem({ name, quantity, expiryDate });
     setName("");
     setQuantity("");
     setExpiryDate("");

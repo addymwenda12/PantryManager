@@ -1,21 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { deletePantryItem } from "@/lib/pantryService";
 import RemoveItemForm from "@/components/RemoveItemForm";
-import { useHistory } from "react-router-dom";
+
 
 /* REMOVE ITEM */
 export default function RemoveItem() {
   const [message, setMessage] = useState("");
   const [itemId, setItemId] = useState("");
-  const history = useHistory();
+  const router = useRouter();
 
-  const handleRemoveItem = async (e) => {
+  const handleRemoveItem = async (e, itemId) => {
     e.preventDefault();
     try {
       await deletePantryItem(itemId);
-      history.push("/pantry");
+      router.push("/pantry");
       setMessage("Item removed successfully");
     } catch (e) {
       setMessage("Error removing item. Please try again.");

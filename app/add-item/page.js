@@ -1,21 +1,22 @@
 'use client';
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { addPantryItem } from "@/lib/pantryService";
 import AddItemForm from "@/components/AddItemForm";
-import { useHistory } from "react-router-dom";
+
 
 /* ADD PANTRY ITEM */
 export default function AddItem() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const router = useRouter();
 
   async function handleAddItem(item) {
     setLoading(true);
     try {
       await addPantryItem(item);
-      history.push("/pantry");
+      router.push("/pantry");
       setMessage("Item added successfully!");
     } catch (e) {
       setMessage("Error adding item. Please try again.");

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+
 export default function Home() {
   return (
     <div>
@@ -8,26 +9,21 @@ export default function Home() {
         <ul>
           <li>
             <Link href="/pantry">
-              <a>View Pantry</a>
+              View Pantry
             </Link>
           </li>
           <li>
             <Link href="/add-item">
-              <a>Add Item</a>
+              Add Item
             </Link>
           </li>
           <li>
             <Link href="/remove-item">
-              <a>Remove Item</a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/update-item">
-              <a>Update Item</a>
+              Remove Item
             </Link>
           </li>
         </ul>
       </nav>
     </div>
   );
-};
+}
