@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { classifyImage } from '../../lib/imageClassification';
+import { classifyImage } from '../../lib/imageClassifications';
 import { addPantryItem } from '../../lib/pantryService';
 import ImageUploader from '../../components/ImageUploader';
 
@@ -23,6 +23,9 @@ export default function ImageUpload() {
 
       // Classify the image
       const result = await classifyImage(base64Image);
+
+      // Log the result for debugging
+      console.log("Classification result:", result);
 
       // Get the top classification
       const topClass = result[0];
