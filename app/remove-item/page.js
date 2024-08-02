@@ -5,11 +5,8 @@ import { useRouter } from "next/navigation";
 import { deletePantryItem } from "@/lib/pantryService";
 import RemoveItemForm from "@/components/RemoveItemForm";
 
-
-/* REMOVE ITEM */
 export default function RemoveItem() {
   const [message, setMessage] = useState("");
-  const [itemId, setItemId] = useState("");
   const router = useRouter();
 
   const handleRemoveItem = async (e, itemId) => {
@@ -26,10 +23,7 @@ export default function RemoveItem() {
   return (
     <div>
       <h2>Remove Item</h2>
-      <RemoveItemForm
-        setItemId={setItemId}
-        handleRemoveItem={handleRemoveItem}
-      />
+      <RemoveItemForm handleRemoveItem={handleRemoveItem} />
       {message && <p>{message}</p>}
     </div>
   );
