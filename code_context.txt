@@ -1,0 +1,725 @@
+// File: components/AddItemForm.js
+import React, { useState } from "react";
+import { TextField, Button } from "@mui/material";
+
+const AddItemForm = ({ onAddItem }) => {
+  const [name, setName] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [expiryDate, setExpiryDate] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAddItem({ name, quantity, expiryDate });
+    setName("");
+    setQuantity("");
+    setExpiryDate("");
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField
+        label="Item Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <TextField
+        label="Quantity"
+        type="number"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+      />
+      <TextField
+        label="Expiry Date"
+        type="date"
+        value={expiryDate}
+        onChange={(e) => setExpiryDate(e.target.value)}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <Button type="submit" variant="contained" color="primary">
+        Add Item
+      </Button>
+    </form>
+  );
+};
+
+export default AddItemForm;
+// File: components/ImageUploader.js
+import React, { useState } from 'react';
+import { Button } from '@mui/material';
+
+const ImageUploader = ({ onUpload }) => {
+  const [image, setImage] = useState(null);
+
+  const handleCapture = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!image) {
+      alert("Please select an image to upload.");
+      return;
+    }
+    onUpload(image);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        id='capture-button'
+        capture='environment'
+        onChange={handleCapture}
+      />
+      <label htmlFor='capture-button'>
+        <Button variant="contained" component="span">
+          Capture Image
+        </Button>
+      </label>
+      {image && (
+        <Button type="submit" variant="contained" color="primary">
+          Upload Image
+        </Button>
+      )}
+    </form>
+  );
+};
+
+export default ImageUploader;
+
+// File: components/PantryItem.js
+import React from "react";
+import { Card, CardContent, Typography } from "@mui/material";
+
+const PantryItem = ({ item }) => {
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h5">{item.name}</Typography>
+        <Typography>Quantity: {item.quantity}</Typography>
+        <Typography>Expiry Date: {item.expiryDate}</Typography>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default PantryItem;
+// File: components/PantryList.js
+import React from "react";
+import PantryItem from './PantryItem';
+import { defaultConfig } from "next/dist/server/config-shared";
+
+const PantryList = ({ items }) => {
+  return (
+		<div>
+			{items.map(item => (
+				<PantryItem key={item.id} item={item} />
+			))}
+		</div>
+	);
+};
+
+export default PantryList;
+// File: components/RecipeSuggestions.js
+import React from "react";
+import { List, ListItem, ListItemText } from "@mui/material";
+
+const RecipeSuggestions = ({ recipes }) => {
+  return (
+    <List>
+      {recipes.map((recipe, index) => (
+        <ListItem key={index}>
+          <ListItemText
+            primary={recipe.name}
+            secondary={recipe.ingredients.join(", ")}
+          />
+        </ListItem>
+      ))}
+    </List>
+  );
+};
+
+export default RecipeSuggestions;
+// File: components/RemoveItemForm.js
+import React, { useState } from "react";
+import { TextField, Button } from "@mui/material";
+
+
+const RemoveItemForm = ({ handleRemoveItem }) => {
+  const [itemId, setItemId] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleRemoveItem(e, itemId);
+    setItemId('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField
+        label="Item Name"
+        value={itemId}
+        onChange={(e) => setItemId(e.target.value)}
+      />
+      <Button type="submit" variant="contained" color="secondary">
+        Remove Item
+      </Button>
+    </form>
+  );
+};
+
+export default RemoveItemForm;
+// File: components/UpdateItemForm.js
+import React, { useState, useEffect } from "react";
+import { TextField, Button } from "@mui/material";
+
+
+const UpdateItemForm = ({ item, onUpdateItem }) => {
+  const [name, setName] = useState(item?.name || "");
+  const [quantity, setQuantity] = useState(item?.quantity || "");
+  const [expiryDate, setExpiryDate] = useState(item?.expiryDate || "");
+
+  useEffect(() => {
+    if (item) {
+      setName(item.name || "");
+      setQuantity(item.quantity || "");
+      setExpiryDate(item.expiryDate || "");
+    }
+  }, [item]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Submitting form with values:", { name, quantity, expiryDate });
+    try {
+      if (typeof onUpdateItem !== 'function') {
+        throw new Error("onUpdateItem is not a function");
+      }
+      console.log("Calling onUpdateItem with:", { ...item, name, quantity, expiryDate });
+      onUpdateItem({ ...item, name, quantity, expiryDate });
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <TextField
+        label="Item Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+      <TextField
+        label="Quantity"
+        type="number"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+      />
+      <TextField
+        label="Expiry Date"
+        type="date"
+        value={expiryDate}
+        onChange={(e) => setExpiryDate(e.target.value)}
+        InputLabelProps={{
+          shrink: true,
+        }}
+      />
+      <Button type="submit" variant="contained" color="primary">
+        Update Item
+      </Button>
+    </form>
+  );
+};
+
+export default UpdateItemForm;
+// File: app/add-item/page.js
+'use client';
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { addPantryItem } from "@/lib/pantryService";
+import AddItemForm from "@/components/AddItemForm";
+
+
+/* ADD PANTRY ITEM */
+export default function AddItem() {
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  async function handleAddItem(item) {
+    setLoading(true);
+    try {
+      await addPantryItem(item);
+      router.push("/pantry");
+      setMessage("Item added successfully!");
+    } catch (e) {
+      setMessage("Error adding item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div>
+      <h1>Add New Item</h1>
+      <AddItemForm onAddItem={handleAddItem} loading={loading} />
+      {message && <p>{message}</p>}
+    </div>
+  );
+}
+// File: app/image-upload/page.js
+'use client';
+
+import { useState } from 'react';
+import { classifyImage } from '../../lib/imageClassifications';
+import { addPantryItem } from '../../lib/pantryService';
+import ImageUploader from '../../components/ImageUploader';
+
+export default function ImageUpload() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [classification, setClassification] = useState(null);
+  const [itemAdded, setItemAdded] = useState(false);
+
+  const handleUpload = async (imageFile) => {
+    setLoading(true);
+    setError(null);
+    setClassification(null);
+    setItemAdded(false);
+
+    try {
+      // Convert the file to base64
+      const base64Image = await fileToBase64(imageFile);
+
+      // Classify the image
+      const result = await classifyImage(base64Image);
+
+      // Log the result for debugging
+      console.log("Classification result:", result);
+
+      // Get the top classification
+      const topClass = result[0];
+
+      setClassification(topClass);
+    } catch (err) {
+      setError('Error classifying image');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddToPantry = async () => {
+    if (!classification) return;
+
+    try {
+      await addPantryItem({
+        name: classification.label,
+        quantity: 1,
+        unit: 'piece',
+      });
+      setItemAdded(true);
+    } catch (err) {
+      setError('Error adding item to pantry');
+      console.error(err);
+    }
+  };
+
+  return (
+    <div>
+      <h1>Upload and Classify Item</h1>
+      <ImageUploader onUpload={handleUpload} />
+
+      {loading && <p>Classifying image...</p>}
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {classification && (
+        <div>
+          <h2>Classification Result:</h2>
+          <p>Item: {classification.label}</p>
+          <p>Confidence: {(classification.score * 100).toFixed(2)}%</p>
+          <button onClick={handleAddToPantry}>Add to Pantry</button>
+        </div>
+      )}
+
+      {itemAdded && <p style={{ color: 'green' }}>Item added to pantry successfully!</p>}
+    </div>
+  );
+}
+
+// Helper function to convert a file to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+}
+
+// File: app/layout.js
+import { Inter } from "next/font/google";
+import "../styles/globals.css";
+
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "Pantry Management App",
+  description: "Keep track of your pantry items",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <header>
+          <h1>{metadata.title}</h1>
+          <p>{metadata.description}</p>
+        </header>
+        <main>{children}</main>
+        <footer>
+          <p>&copy; 2024</p>
+        </footer>
+      </body>
+    </html>
+  );
+}
+
+// File: app/page.js
+import Link from "next/link";
+
+
+export default function Home() {
+  return (
+    <div>
+      <h1>Welcome to the Pantry</h1>
+      <nav>
+        <ul>
+          <li>
+            <Link href="/pantry">
+              View Pantry
+            </Link>
+          </li>
+          <li>
+            <Link href="/add-item">
+              Add Item
+            </Link>
+          </li>
+          <li>
+            <Link href="/remove-item">
+              Remove Item
+            </Link>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
+}
+// File: app/pantry/[id]/page.js
+'use client';
+
+import { useState, useEffect } from "react";
+import {doc, getDoc} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { updatePantryItem, deletePantryItem } from "@/lib/pantryService";
+import { useRouter } from "next/navigation";
+
+
+export default function PantryItem({ params }) {
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editedItem, setEditedItem] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchItem() {
+      try {
+        const docRef = await getDoc(doc(db, "pantry", params.id));
+        const docSnap = await getDoc(docRef);
+
+        if (docRef.exists()) {
+          setItem({ id: itemDoc.id, ...docSnap.data() });
+          setEditedItem({ id: itemDoc.id, ...docSnap.data() });
+        } else {
+          setError("Item not found");
+        }
+      } catch (e) {
+        setError("Error fetching item. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchItem();
+  }, [params.id]);
+
+  const handleEdit = () => {
+    setEditMode(true);
+  };
+
+  const handleCancel = () => {
+    setEditMode(false);
+    setEditedItem(item);
+  };
+
+  const handleSave = async () => {
+    try {
+      await updatePantryItem(item, editedItem);
+      setItem(editedItem);
+      setEditMode(false);
+    } catch (e) {
+      setError("Error updating item. Please try again.");
+      console.error(e);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this item?")) {
+      try {
+        await deletePantryItem(item);
+        router.push("/pantry");
+      } catch (e) {
+        setError("Error deleting item. Please try again.");
+        console.error(e);
+      }
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedItem({ ...editedItem, [name]: value });
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+  if (error) {
+    return <p>{error}</p>;
+  }
+  if (!item) {
+    return <p>Item not found</p>;
+  }
+
+  return (
+    <div>
+      <h1>Pantry Item Details</h1>
+      {editMode ? (
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+        <div>
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={editedItem.name}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="quantity">Quantity:</label>
+          <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            value={editedItem.quantity}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="unit">Unit:</label>
+          <input
+            type="text"
+            id="unit"
+            name="unit"
+            value={editedItem.unit}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="expiryDate">Expiry Date:</label>
+          <input
+            type="date"
+            id="expiryDate"
+            name="expiryDate"
+            value={editedItem.expiryDate}
+            onChange={handleChange}
+          />
+        </div>
+        <button type="submit">Save</button>
+        <button type="button" onClick={handleCancel}>Cancel</button>
+      </form>
+      ) : (
+        <div>
+          <p><strong>Name:</strong> {item.name}</p>
+          <p><strong>Quantity:</strong> {item.quantity} {item.unit}</p>
+          {item.expiryDate && (
+            <p><strong>Expiry Date:</strong> {new Date(item.expiryDate).toLocaleDateString}</p>
+          )}
+          <button onClick={handleEdit}>Edit</button>
+          <button onClick={handleDelete}>Delete</button>
+        </div>
+      )}
+    </div>
+  );
+}
+// File: app/pantry/page.js
+import { getPantryItems } from "@/lib/pantryService";
+import PantryList from "@/components/PantryList";
+
+/* GET PANTRY ITEMS */
+export default async function Pantry() {
+  const items = await getPantryItems();
+
+  return (
+    <div>
+      <h1>My Pantry</h1>
+      <PantryList items={items} />
+    </div>
+  );
+}
+// File: app/recipes/page.js
+'use client';
+
+import { useState, useEffect } from "react";
+import { getPantryItems } from "@/lib/pantryService";
+import { getRecipeSuggestion } from "@/lib/openAI";
+import RecipeSuggestions from "@/components/RecipeSuggestions";
+
+export default function Recipes() {
+  const [pantryItems, setPantryItems] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchPantryItemsAndRecipes() {
+      try {
+        // Fetch pantry items from firebase
+        const items = await getPantryItems();
+        setPantryItems(items);
+
+        // Get recipes suggestions based on pantry items
+        const itemNames = items.map((item) => item.name);
+        const suggestions = await getRecipeSuggestion(itemNames);
+        setRecipes(suggestions);
+      } catch (e) {
+        setError("Error fetching pantry items. Please try again.");
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPantryItemsAndRecipes();
+  }, []);
+
+  if (loading) {
+    return <div>Loading recipes...</div>;
+  }
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  return (
+    <div>
+      <h2>Recipe Suggestions</h2>
+      <h3>Based on your pantry contents:</h3>
+      <ul>
+        {pantryItems.map((item) => (
+          <li key={item.id}>{item.name} - {item.quantity} {item.unit}</li>
+        ))}
+      </ul>
+      {recipes.length > 0 ? (
+        <RecipeSuggestions recipes={recipes} />
+      ) : (
+        <p>No recipe suggestions available. Try adding more items to your pantry</p>
+      )}
+    </div>
+  );
+}
+// File: app/remove-item/page.js
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { deletePantryItem } from "@/lib/pantryService";
+import RemoveItemForm from "@/components/RemoveItemForm";
+
+
+/* REMOVE ITEM */
+export default function RemoveItem() {
+  const [message, setMessage] = useState("");
+  const [itemId, setItemId] = useState("");
+  const router = useRouter();
+
+  const handleRemoveItem = async (e, itemId) => {
+    e.preventDefault();
+    try {
+      await deletePantryItem(itemId);
+      router.push("/pantry");
+      setMessage("Item removed successfully");
+    } catch (e) {
+      setMessage("Error removing item. Please try again.");
+    }
+  };
+
+  return (
+    <div>
+      <h2>Remove Item</h2>
+      <RemoveItemForm
+        setItemId={setItemId}
+        handleRemoveItem={handleRemoveItem}
+      />
+      {message && <p>{message}</p>}
+    </div>
+  );
+}
+
+// File: app/update-item/page.js
+'use client';
+
+import { useState } from "react";
+import { updatePantryItem } from "@/lib/pantryService";
+import UpdateItemForm from "@/components/UpdateItemForm";
+
+/* UPDATE ITEM */
+export default function UpdateItem() {
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleUpdateItem(itemId, newData) {
+    setLoading(true);
+    try {
+      await updatePantryItem(item, newData);
+      setMessage("Item updated successfully!");
+    } catch (e) {
+      setMessage("Error updating item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div>
+      <h2>Update Item</h2>
+      <UpdateItemForm onUpdateItem={handleUpdateItem} loading={loading} />
+      {message && <p>{message}</p>}
+    </div>
+  );
+}
+// File: styles/globals.css
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
