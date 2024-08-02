@@ -1,14 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
+import { firestore } from "@/firebase";
 
 const UpdateItemForm = ({ item, onUpdateItem }) => {
-  const [name, setName] = useState(item.name);
-  const [quantity, setQuantity] = useState(item.quantity);
-  const [expiryDate, setExpiryDate] = useState(item.expiryDate);
+  const [name, setName] = useState(item?.name || "");
+  const [quantity, setQuantity] = useState(item?.quantity || "");
+  const [expiryDate, setExpiryDate] = useState(item?.expiryDate || "");
+
+  useEffect(() => {
+    if (item) {
+      setName(item.name || "");
+      setQuantity(item.quantity || "");
+      setExpiryDate(item.expiryDate || "");
+    }
+  }, [item]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onUpdateItem({ ...item, name, quantity, expiryDate });
+    console.log("Submitting form with values:", { name, quantity, expiryDate });
+    try {
+      if (typeof onUpdateItem !== 'function') {
+        throw new Error("onUpdateItem is not a function");
+      }
+      console.log("Calling onUpdateItem with:", { ...item, name, quantity, expiryDate });
+      onUpdateItem({ ...item, name, quantity, expiryDate });
+    } catch (error) {
+      console.error("Error updating item:", error);
+    }
   };
 
   return (
@@ -30,8 +48,8 @@ const UpdateItemForm = ({ item, onUpdateItem }) => {
         value={expiryDate}
         onChange={(e) => setExpiryDate(e.target.value)}
         InputLabelProps={{
-        shrink: true,
-      }}
+          shrink: true,
+        }}
       />
       <Button type="submit" variant="contained" color="primary">
         Update Item
