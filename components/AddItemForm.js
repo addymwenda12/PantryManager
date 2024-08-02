@@ -1,45 +1,81 @@
 import React, { useState } from "react";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Box, CircularProgress } from "@mui/material";
 
-const AddItemForm = ({ onAddItem }) => {
-  const [name, setName] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
+const AddItemForm = ({ onAddItem, loading }) => {
+  const [item, setItem] = useState({
+    name: "",
+    quantity: "",
+    unit: "",
+    expiryDate: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setItem(prevItem => ({ ...prevItem, [name]: value }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAddItem({ name, quantity, expiryDate });
-    setName("");
-    setQuantity("");
-    setExpiryDate("");
+    onAddItem(item);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="name"
         label="Item Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        name="name"
+        autoFocus
+        value={item.name}
+        onChange={handleChange}
       />
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="quantity"
         label="Quantity"
+        name="quantity"
         type="number"
-        value={quantity}
-        onChange={(e) => setQuantity(e.target.value)}
+        value={item.quantity}
+        onChange={handleChange}
       />
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="unit"
+        label="Unit"
+        name="unit"
+        value={item.unit}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        id="expiryDate"
         label="Expiry Date"
+        name="expiryDate"
         type="date"
-        value={expiryDate}
-        onChange={(e) => setExpiryDate(e.target.value)}
         InputLabelProps={{
           shrink: true,
         }}
+        value={item.expiryDate}
+        onChange={handleChange}
       />
-      <Button type="submit" variant="contained" color="primary">
-        Add Item
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+        disabled={loading}
+      >
+        {loading ? <CircularProgress size={24} /> : "Add Item"}
       </Button>
-    </form>
+    </Box>
   );
 };
 

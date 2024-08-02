@@ -1,60 +1,91 @@
 import React, { useState, useEffect } from "react";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Box, CircularProgress } from "@mui/material";
 
-
-const UpdateItemForm = ({ item, onUpdateItem }) => {
-  const [name, setName] = useState(item?.name || "");
-  const [quantity, setQuantity] = useState(item?.quantity || "");
-  const [expiryDate, setExpiryDate] = useState(item?.expiryDate || "");
+const UpdateItemForm = ({ item, onUpdateItem, loading }) => {
+  const [updatedItem, setUpdatedItem] = useState({
+    name: "",
+    quantity: "",
+    unit: "",
+    expiryDate: ""
+  });
 
   useEffect(() => {
     if (item) {
-      setName(item.name || "");
-      setQuantity(item.quantity || "");
-      setExpiryDate(item.expiryDate || "");
+      setUpdatedItem(item);
     }
   }, [item]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Submitting form with values:", { name, quantity, expiryDate });
-    try {
-      if (typeof onUpdateItem !== 'function') {
-        throw new Error("onUpdateItem is not a function");
-      }
-      console.log("Calling onUpdateItem with:", { ...item, name, quantity, expiryDate });
-      onUpdateItem({ ...item, name, quantity, expiryDate });
-    } catch (error) {
-      console.error("Error updating item:", error);
-    }
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedItem(prevItem => ({ ...prevItem, [name]: value }));
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdateItem(updatedItem.id, updatedItem);
+  };
+
+  if (!item) {
+    return <p>No item to update</p>;
+  }
+
   return (
-    <form onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="name"
         label="Item Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        name="name"
+        autoFocus
+        value={updatedItem.name}
+        onChange={handleChange}
       />
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="quantity"
         label="Quantity"
+        name="quantity"
         type="number"
-        value={quantity}
-        onChange={(e) => setQuantity(e.target.value)}
+        value={updatedItem.quantity}
+        onChange={handleChange}
       />
       <TextField
+        margin="normal"
+        required
+        fullWidth
+        id="unit"
+        label="Unit"
+        name="unit"
+        value={updatedItem.unit}
+        onChange={handleChange}
+      />
+      <TextField
+        margin="normal"
+        fullWidth
+        id="expiryDate"
         label="Expiry Date"
+        name="expiryDate"
         type="date"
-        value={expiryDate}
-        onChange={(e) => setExpiryDate(e.target.value)}
         InputLabelProps={{
           shrink: true,
         }}
+        value={updatedItem.expiryDate}
+        onChange={handleChange}
       />
-      <Button type="submit" variant="contained" color="primary">
-        Update Item
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        sx={{ mt: 3, mb: 2 }}
+        disabled={loading}
+      >
+        {loading ? <CircularProgress size={24} /> : "Update Item"}
       </Button>
-    </form>
+    </Box>
   );
 };
 
