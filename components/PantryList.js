@@ -1,6 +1,5 @@
 import React from "react";
 import PantryItem from './PantryItem';
-import { defaultConfig } from "next/dist/server/config-shared";
 
 const PantryList = ({ items }) => {
   return (
