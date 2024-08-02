@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button } from "@mui/material";
-import { firestore } from "@/firebase";
+
 
 const RemoveItemForm = ({ handleRemoveItem }) => {
   const [itemId, setItemId] = useState('');

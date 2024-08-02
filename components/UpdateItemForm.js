@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
-import { firestore } from "@/firebase";
+
 
 const UpdateItemForm = ({ item, onUpdateItem }) => {
   const [name, setName] = useState(item?.name || "");
