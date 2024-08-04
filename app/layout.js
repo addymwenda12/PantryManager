@@ -42,7 +42,7 @@ export default function RootLayout({ children }) {
           </main>
         </div>
         <footer>
-          <p>&copy; Panrty App</p>
+          <p>&copy; Panty App</p>
         </footer>
       </body>
     </html>
