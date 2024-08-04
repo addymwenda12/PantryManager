@@ -4,6 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import PrintIcon from '@mui/icons-material/Print';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import ShareIcon from '@mui/icons-material/Share';
+import Image from 'next/image';
 
 const RecipeDetail = ({ recipe }) => {
   return (
@@ -46,7 +47,7 @@ const RecipeDetail = ({ recipe }) => {
             <Typography variant="body1">Ready: {recipe.readyTime} mins</Typography>
             <Typography variant="body1">Servings: {recipe.servings}</Typography>
           </Box>
-          <img src={recipe.image} alt={recipe.name} style={{ width: '100%', borderRadius: '8px' }} />
+          <Image src={recipe.image} alt={recipe.name} style={{ width: '100%', borderRadius: '8px' }} />
           <Typography variant="body2" sx={{ mt: 1 }}>
             {recipe.photoCount} Photos
           </Typography>
