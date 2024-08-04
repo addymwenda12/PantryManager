@@ -160,6 +160,67 @@ const PantryList = ({ items }) => {
 };
 
 export default PantryList;
+// File: components/RecipeDetails.js
+import React from 'react';
+import { Typography, Grid, Paper, Box } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import PrintIcon from '@mui/icons-material/Print';
+import StarBorderIcon from '@mui/icons-material/StarBorder';
+import ShareIcon from '@mui/icons-material/Share';
+import Image from 'next/image';
+
+const RecipeDetail = ({ recipe }) => {
+  return (
+    <Paper elevation={3} sx={{ p: 3 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12} md={8}>
+          <Typography variant="h4" gutterBottom>
+            {recipe.name}
+          </Typography>
+          <Typography variant="subtitle1" gutterBottom>
+            Source: {recipe.source}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <EditIcon />
+            <PrintIcon />
+            <StarBorderIcon />
+            <ShareIcon />
+          </Box>
+          <Typography variant="h6" gutterBottom>
+            Ingredients
+          </Typography>
+          <ul>
+            {recipe.ingredients.map((ingredient, index) => (
+              <li key={index}>{ingredient}</li>
+            ))}
+          </ul>
+          <Typography variant="h6" gutterBottom>
+            Instructions
+          </Typography>
+          <ol>
+            {recipe.instructions.map((instruction, index) => (
+              <li key={index}>{instruction}</li>
+            ))}
+          </ol>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body1">Prep: {recipe.prepTime} mins</Typography>
+            <Typography variant="body1">Cook: {recipe.cookTime} mins</Typography>
+            <Typography variant="body1">Ready: {recipe.readyTime} mins</Typography>
+            <Typography variant="body1">Servings: {recipe.servings}</Typography>
+          </Box>
+          <Image src={recipe.image} alt={recipe.name} style={{ width: '100%', borderRadius: '8px' }} />
+          <Typography variant="body2" sx={{ mt: 1 }}>
+            {recipe.photoCount} Photos
+          </Typography>
+        </Grid>
+      </Grid>
+    </Paper>
+  );
+};
+
+export default RecipeDetail;
 // File: components/RecipeSuggestions.js
 import React from "react";
 import { List, ListItem, ListItemText } from "@mui/material";
@@ -687,57 +748,54 @@ export default async function Pantry() {
 import { useState, useEffect } from "react";
 import { getPantryItems } from "@/lib/pantryService";
 import { getRecipeSuggestion } from "@/lib/openAI";
-import RecipeSuggestions from "@/components/RecipeSuggestions";
+import RecipeDetail from "@/components/RecipeDetail";
+import { Typography, Box, CircularProgress } from "@mui/material";
 
 export default function Recipes() {
   const [pantryItems, setPantryItems] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchPantryItemsAndRecipes() {
+    async function fetchPantryItemsAndRecipe() {
       try {
-        // Fetch pantry items from firebase
         const items = await getPantryItems();
         setPantryItems(items);
 
-        // Get recipes suggestions based on pantry items
         const itemNames = items.map((item) => item.name);
         const suggestions = await getRecipeSuggestion(itemNames);
-        setRecipes(suggestions);
+        setRecipe(suggestions[0]); // Assuming getRecipeSuggestion returns an array of recipes
       } catch (e) {
-        setError("Error fetching pantry items. Please try again.");
+        setError("Error fetching data. Please try again.");
         console.error(e);
       } finally {
         setLoading(false);
       }
     }
-    fetchPantryItemsAndRecipes();
+    fetchPantryItemsAndRecipe();
   }, []);
 
   if (loading) {
-    return <div>Loading recipes...</div>;
+    return <CircularProgress />;
   }
   if (error) {
-    return <div>{error}</div>;
+    return <Typography color="error">{error}</Typography>;
   }
 
   return (
-    <div>
-      <h2>Recipe Suggestions</h2>
-      <h3>Based on your pantry contents:</h3>
-      <ul>
-        {pantryItems.map((item) => (
-          <li key={item.id}>{item.name} - {item.quantity} {item.unit}</li>
-        ))}
-      </ul>
-      {recipes.length > 0 ? (
-        <RecipeSuggestions recipes={recipes} />
+    <Box sx={{ maxWidth: 1200, margin: 'auto', p: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Recipe Suggestion
+      </Typography>
+      {recipe ? (
+        <RecipeDetail recipe={recipe} />
       ) : (
-        <p>No recipe suggestions available. Try adding more items to your pantry</p>
+        <Typography>
+          No recipe suggestions available. Try adding more items to your pantry.
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }
 // File: app/remove-item/page.js
@@ -842,4 +900,28 @@ footer {
   text-align: center;
   padding: 10px;
   background-color: #f0f0f0;
+}
+
+body {
+  background-color: #f5f5f5;
+}
+
+.MuiPaper-root {
+  background-color: #ffffff;
+}
+
+.MuiTypography-h4 {
+  color: #ff6600;
+}
+
+.MuiTypography-subtitle1 {
+  color: #666666;
+}
+
+ul, ol {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 8px;
 }

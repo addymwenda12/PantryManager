@@ -21,7 +21,7 @@ export default function PantryItem({ params }) {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const itemData = { id: docSnap.id, ...docSnap.data() };
+          const itemData = { itemId: docSnap.id, ...docSnap.data() };
           setItem(itemData);
           setEditedItem(itemData);
         } else {
