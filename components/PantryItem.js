@@ -1,13 +1,17 @@
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, Box } from "@mui/material";
 
 const PantryItem = ({ item }) => {
   return (
-    <Card>
+    <Card elevation={3} sx={{ mb: 2, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h5">{item.name}</Typography>
-        <Typography>Quantity: {item.quantity}</Typography>
-        <Typography>Expiry Date: {item.expiryDate}</Typography>
+        <Typography variant="h6" gutterBottom>
+          {item.name}
+        </Typography>
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body1">Quantity: {item.quantity}</Typography>
+          <Typography variant="body1">Expiry: {item.expiryDate}</Typography>
+        </Box>
       </CardContent>
     </Card>
   );

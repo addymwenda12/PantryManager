@@ -1,19 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+:root {
+  --primary-color: #FF6600;
+  --secondary-color: #FFA366;
+  --background-color: #F5F5F5;
+  --text-color: #333333;
+  --card-background: #FFFFFF;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
 .layout {
   display: flex;
-  flex-direction: row;
   min-height: 100vh;
 }
 
 .sidebar {
-  width: 200px;
-  background-color: #b1b0b0;
+  width: 250px;
+  background-color: var(--card-background);
   padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar ul {
@@ -21,43 +37,61 @@
 }
 
 .sidebar li {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.sidebar a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.sidebar a:hover {
+  color: var(--primary-color);
 }
 
 .content {
-  flex: 1;
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
+  padding: 30px;
 }
 
 header {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  color: var(--text-color);
+  font-size: 1.1rem;
 }
 
 footer {
   text-align: center;
-  padding: 10px;
-  background-color: #f0f0f0;
-}
-
-body {
-  background-color: #e1e1e1;
+  padding: 20px;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  font-size: 0.9rem;
 }
 
 .MuiPaper-root {
-  background-color: #ffffff;
+  background-color: var(--card-background);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .MuiTypography-h4 {
-  color: #ff6600;
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
 .MuiTypography-subtitle1 {
-  color: #666666;
+  color: var(--text-color);
 }
 
 ul, ol {
@@ -68,6 +102,34 @@ li {
   margin-bottom: 8px;
 }
 
-.center-text {
-  text-align: center;
+.MuiButton-root {
+  text-transform: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.MuiButton-contained {
+  background-color: var(--primary-color);
+}
+
+.MuiButton-contained:hover {
+  background-color: var(--secondary-color);
+}
+
+.MuiTextField-root {
+  margin-bottom: 16px;
+}
+
+.MuiInputLabel-root {
+  color: var(--text-color);
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 4px;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary-color);
 }
