@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { getPantryItems } from "@/lib/pantryService";
-import { getRecipeSuggestion } from "@/lib/openAI";
-import RecipeDetail from "@/components/RecipeDetail";
+import { getRecipeSuggestions } from "@/lib/openAI";
+import RecipeDetail from "@/components/RecipeDetails";
 import { Typography, Box, CircularProgress } from "@mui/material";
 
 export default function Recipes() {
