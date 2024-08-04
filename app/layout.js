@@ -52,7 +52,7 @@ export default function RootLayout({ children }) {
               <Toolbar />
               <Box sx={{ overflow: 'auto' }}>
                 <List>
-                  {['Home', 'Pantry', 'Add Item', 'Image Upload', 'Recipes'].map((text, index) => (
+                  {['Home', 'Pantry', 'Add Item', 'Remove Item', 'Update Item','Image Upload', 'Recipes'].map((text, index) => (
                     <ListItem button key={text} component={Link} href={index === 0 ? '/' : `/${text.toLowerCase().replace(' ', '-')}`}>
                       <ListItemText primary={text} />
                     </ListItem>
