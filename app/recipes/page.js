@@ -3,56 +3,53 @@
 import { useState, useEffect } from "react";
 import { getPantryItems } from "@/lib/pantryService";
 import { getRecipeSuggestion } from "@/lib/openAI";
-import RecipeSuggestions from "@/components/RecipeSuggestions";
+import RecipeDetail from "@/components/RecipeDetail";
+import { Typography, Box, CircularProgress } from "@mui/material";
 
 export default function Recipes() {
   const [pantryItems, setPantryItems] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    async function fetchPantryItemsAndRecipes() {
+    async function fetchPantryItemsAndRecipe() {
       try {
-        // Fetch pantry items from firebase
         const items = await getPantryItems();
         setPantryItems(items);
 
-        // Get recipes suggestions based on pantry items
         const itemNames = items.map((item) => item.name);
         const suggestions = await getRecipeSuggestion(itemNames);
-        setRecipes(suggestions);
+        setRecipe(suggestions[0]); // Assuming getRecipeSuggestion returns an array of recipes
       } catch (e) {
-        setError("Error fetching pantry items. Please try again.");
+        setError("Error fetching data. Please try again.");
         console.error(e);
       } finally {
         setLoading(false);
       }
     }
-    fetchPantryItemsAndRecipes();
+    fetchPantryItemsAndRecipe();
   }, []);
 
   if (loading) {
-    return <div>Loading recipes...</div>;
+    return <CircularProgress />;
   }
   if (error) {
-    return <div>{error}</div>;
+    return <Typography color="error">{error}</Typography>;
   }
 
   return (
-    <div>
-      <h2>Recipe Suggestions</h2>
-      <h3>Based on your pantry contents:</h3>
-      <ul>
-        {pantryItems.map((item) => (
-          <li key={item.id}>{item.name} - {item.quantity} {item.unit}</li>
-        ))}
-      </ul>
-      {recipes.length > 0 ? (
-        <RecipeSuggestions recipes={recipes} />
+    <Box sx={{ maxWidth: 1200, margin: 'auto', p: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Recipe Suggestion
+      </Typography>
+      {recipe ? (
+        <RecipeDetail recipe={recipe} />
       ) : (
-        <p>No recipe suggestions available. Try adding more items to your pantry</p>
+        <Typography>
+          No recipe suggestions available. Try adding more items to your pantry.
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }
