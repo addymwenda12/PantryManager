@@ -15,9 +15,10 @@
 }
 
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
+  height: 100vh;
 }
 
 .layout {
@@ -132,4 +133,42 @@ li {
 
 .MuiOutlinedInput-notchedOutline {
   border-color: var(--primary-color);
+}
+
+/* Add these styles to your existing global.css */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 30px;
+}
+
+footer {
+  margin-top: auto;
 }
