@@ -7,6 +7,10 @@ import ShareIcon from '@mui/icons-material/Share';
 import Image from 'next/image';
 
 const RecipeDetail = ({ recipe }) => {
+  if (!recipe) {
+    return <p>No recipe available</p>;
+  }
+
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Grid container spacing={3}>

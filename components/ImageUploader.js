@@ -6,9 +6,12 @@ const ImageUploader = ({ onUpload }) => {
 
   const handleCapture = (e) => {
     const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
     setImage(file);
+    } else {
+      alert("Please select a valid image file.");
+    }
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!image) {

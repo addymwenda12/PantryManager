@@ -153,7 +153,7 @@ const PantryList = ({ items }) => {
   return (
 		<div>
 			{items.map(item => (
-				<PantryItem key={item.id} item={item} />
+				<PantryItem key={item.itemId || index} item={item} />
 			))}
 		</div>
 	);
@@ -600,7 +600,7 @@ export default function PantryItem({ params }) {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const itemData = { id: docSnap.id, ...docSnap.data() };
+          const itemData = { itemId: docSnap.id, ...docSnap.data() };
           setItem(itemData);
           setEditedItem(itemData);
         } else {
