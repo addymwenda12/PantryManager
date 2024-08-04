@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getPantryItems, addPantryItem } from "@/lib/pantryService";
-import { getRecipeSuggestion } from "@/lib/openAI";
+import { getRecipeSuggestions } from "@/lib/openAI";
 import { classifyImage } from "@/lib/imageClassifications";
 import { Typography, Box, Button, CircularProgress, Snackbar } from "@mui/material";
 import CameraSection from "@/components/CameraSection";
