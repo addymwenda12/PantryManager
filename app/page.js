@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getPantryItems } from "@/lib/pantryService";
+import { getPantryItems, addPantryItem } from "@/lib/pantryService";
 import { getRecipeSuggestion } from "@/lib/openAI";
-import { Typography, Box, Button, CircularProgress } from "@mui/material";
+import { classifyImage } from "@/lib/imageClassifications";
+import { Typography, Box, Button, CircularProgress, Snackbar } from "@mui/material";
+import CameraSection from "@/components/CameraSection";
 
 export default function Home() {
   const [recipe, setRecipe] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   useEffect(() => {
     async function fetchRecipeSuggestion() {
@@ -25,6 +28,32 @@ export default function Home() {
     }
     fetchRecipeSuggestion();
   }, []);
+
+  const handleCapture = async (file) => {
+    try {
+      setLoading(true);
+      const base64Image = await fileToBase64(file);
+      const result = await classifyImage(base64Image);
+      const topClass = result[0];
+
+      await addPantryItem({
+        name: topClass.label,
+        quantity: 1,
+        unit: 'piece',
+      });
+
+      setSnackbar({ open: true, message: `Added ${topClass.label} to pantry` });
+    } catch (e) {
+      console.error("Error processing image:", e);
+      setSnackbar({ open: true, message: 'Error processing image' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <Box sx={{ maxWidth: 800, margin: 'auto' }}>
@@ -63,6 +92,23 @@ export default function Home() {
           <Typography>No recipe suggestions available. Try adding more items to your pantry.</Typography>
         )}
       </Box>
+      <CameraSection onCapture={handleCapture} />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbar.message}
+      />
     </Box>
   );
+}
+
+// Helper function to convert a file to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
 }
