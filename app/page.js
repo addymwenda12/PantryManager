@@ -22,6 +22,11 @@ export default function Home() {
               Remove Item
             </Link>
           </li>
+          <li>
+            <Link href="/update-item">
+              Update Item
+            </Link>
+          </li>
         </ul>
       </nav>
     </div>
