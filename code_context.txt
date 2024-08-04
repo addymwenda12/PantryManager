@@ -81,6 +81,60 @@ const AddItemForm = ({ onAddItem, loading }) => {
 };
 
 export default AddItemForm;
+// File: components/CameraSection.js
+// File: components/CameraSection.js
+import React, { useState, useRef } from 'react';
+import { Button, Box, Typography } from '@mui/material';
+import { Camera } from 'lucide-react';
+import Image from 'next/image';
+
+const CameraSection = ({ onCapture }) => {
+  const [imagePreview, setImagePreview] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleCapture = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      onCapture(file);
+    }
+  };
+
+  return (
+    <Box sx={{ mt: 4 }}>
+      <Typography variant="h5" gutterBottom>
+        Capture Ingredient
+      </Typography>
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleCapture}
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+      />
+      <Button
+        variant="contained"
+        startIcon={<Camera />}
+        onClick={() => fileInputRef.current.click()}
+      >
+        Take Photo
+      </Button>
+      {imagePreview && (
+        <Box sx={{ mt: 2 }}>
+          <Image src={imagePreview} alt="Captured ingredient" style={{ maxWidth: '100%', maxHeight: '300px' }} />
+        </Box>
+      )}
+    </Box>
+  );
+};
+
+export default CameraSection;
+
 // File: components/ImageUploader.js
 import React, { useState } from 'react';
 import { Button } from '@mui/material';
@@ -90,9 +144,12 @@ const ImageUploader = ({ onUpload }) => {
 
   const handleCapture = (e) => {
     const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
     setImage(file);
+    } else {
+      alert("Please select a valid image file.");
+    }
   };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!image) {
@@ -130,21 +187,26 @@ export default ImageUploader;
 
 // File: components/PantryItem.js
 import React from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, Box } from "@mui/material";
 
 const PantryItem = ({ item }) => {
   return (
-    <Card>
+    <Card elevation={3} sx={{ mb: 2, borderRadius: 2 }}>
       <CardContent>
-        <Typography variant="h5">{item.name}</Typography>
-        <Typography>Quantity: {item.quantity}</Typography>
-        <Typography>Expiry Date: {item.expiryDate}</Typography>
+        <Typography variant="h6" gutterBottom>
+          {item.name}
+        </Typography>
+        <Box display="flex" justifyContent="space-between">
+          <Typography variant="body1">Quantity: {item.quantity}</Typography>
+          <Typography variant="body1">Expiry: {item.expiryDate}</Typography>
+        </Box>
       </CardContent>
     </Card>
   );
 };
 
 export default PantryItem;
+
 // File: components/PantryList.js
 import React from "react";
 import PantryItem from './PantryItem';
@@ -170,6 +232,10 @@ import ShareIcon from '@mui/icons-material/Share';
 import Image from 'next/image';
 
 const RecipeDetail = ({ recipe }) => {
+  if (!recipe) {
+    return <p>No recipe available</p>;
+  }
+
   return (
     <Paper elevation={3} sx={{ p: 3 }}>
       <Grid container spacing={3}>
@@ -491,91 +557,210 @@ function fileToBase64(file) {
 }
 
 // File: app/layout.js
+'use client';
+
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { AppBar, Toolbar, Typography, Drawer, List, ListItem, ListItemText, Box, Container } from '@mui/material';
+import theme from './theme';
 import "../styles/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
+const metadata = {
   title: "Pantry Management App",
   description: "Keep track of your pantry items",
 };
+
+const drawerWidth = 240;
+
+// Separate component for AppBar to handle dynamic styles
+const StyledAppBar = () => (
+  <AppBar
+    position="fixed"
+    sx={{
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+    }}
+  >
+    <Toolbar>
+      <Typography variant="h6" noWrap component="div">
+        {metadata.title}
+      </Typography>
+    </Toolbar>
+  </AppBar>
+);
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="layout">
-          <nav className="sidebar">
-            <ul>
-              <li>
-                <Link href="/">Home</Link>
-              </li>
-              <li>
-                <Link href="/pantry">Pantry</Link>
-              </li>
-              <li>
-                <Link href="/add-item">Add Item</Link>
-              </li>
-              <li>
-                <Link href="/image-upload">Image Upload</Link>
-              </li>
-              <li>
-                <Link href="/recipes">Recipes</Link>
-              </li>
-            </ul>
-          </nav>
-          <main className="content">
-            <header>
-              <h1>{metadata.title}</h1>
-              <p>{metadata.description}</p>
-            </header>
-            {children}
-          </main>
-        </div>
-        <footer>
-          <p>&copy; Panrty App</p>
-        </footer>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Box sx={{ display: 'flex' }}>
+            <StyledAppBar />
+            <Drawer
+              variant="permanent"
+              sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+              }}
+            >
+              <Toolbar />
+              <Box sx={{ overflow: 'auto' }}>
+                <List>
+                  {['Home', 'Pantry', 'Add Item', 'Image Upload', 'Recipes'].map((text, index) => (
+                    <ListItem button key={text} component={Link} href={index === 0 ? '/' : `/${text.toLowerCase().replace(' ', '-')}`}>
+                      <ListItemText primary={text} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            </Drawer>
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <Toolbar />
+              <Container maxWidth="lg">
+                <Typography variant="h4" component="h1" gutterBottom>
+                  {metadata.title}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  {metadata.description}
+                </Typography>
+                {children}
+              </Container>
+            </Box>
+          </Box>
+          <Box component="footer" sx={{ bgcolor: 'background.paper', py: 6 }}>
+            <Container maxWidth="lg">
+              <Typography variant="body2" color="text.secondary" align="center">
+                © {new Date().getFullYear()} Pantry App
+              </Typography>
+            </Container>
+          </Box>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
-// File: app/page.js
-import Link from "next/link";
 
+// File: app/page.js
+'use client';
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { getPantryItems, addPantryItem } from "@/lib/pantryService";
+import { getRecipeSuggestion } from "@/lib/openAI";
+import { classifyImage } from "@/lib/imageClassifications";
+import { Typography, Box, Button, CircularProgress, Snackbar } from "@mui/material";
+import CameraSection from "@/components/CameraSection";
 
 export default function Home() {
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
+
+  useEffect(() => {
+    async function fetchRecipeSuggestion() {
+      try {
+        const items = await getPantryItems();
+        const itemNames = items.map((item) => item.name);
+        const suggestions = await getRecipeSuggestion(itemNames);
+        setRecipe(suggestions[0]);
+      } catch (e) {
+        console.error("Error fetching recipe suggestion:", e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchRecipeSuggestion();
+  }, []);
+
+  const handleCapture = async (file) => {
+    try {
+      setLoading(true);
+      const base64Image = await fileToBase64(file);
+      const result = await classifyImage(base64Image);
+      const topClass = result[0];
+
+      await addPantryItem({
+        name: topClass.label,
+        quantity: 1,
+        unit: 'piece',
+      });
+
+      setSnackbar({ open: true, message: `Added ${topClass.label} to pantry` });
+    } catch (e) {
+      console.error("Error processing image:", e);
+      setSnackbar({ open: true, message: 'Error processing image' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   return (
-    <div>
-      <h1>Welcome to the Pantry</h1>
-      <nav>
-        <ul>
-          <li>
-            <Link href="/pantry">
-              View Pantry
-            </Link>
-          </li>
-          <li>
-            <Link href="/add-item">
-              Add Item
-            </Link>
-          </li>
-          <li>
-            <Link href="/remove-item">
-              Remove Item
-            </Link>
-          </li>
-          <li>
-            <Link href="/update-item">
-              Update Item
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <Box sx={{ maxWidth: 800, margin: 'auto' }}>
+      <Typography variant="h4" gutterBottom>
+        Welcome to the Pantry
+      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+        <Button variant="contained" component={Link} href="/pantry">
+          View Pantry
+        </Button>
+        <Button variant="contained" component={Link} href="/add-item">
+          Add Item
+        </Button>
+        <Button variant="contained" component={Link} href="/remove-item">
+          Remove Item
+        </Button>
+        <Button variant="contained" component={Link} href="/update-item">
+          Update Item
+        </Button>
+      </Box>
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h5" gutterBottom>
+          AI Recipe Suggestion
+        </Typography>
+        {loading ? (
+          <CircularProgress />
+        ) : recipe ? (
+          <Box>
+            <Typography variant="h6">{recipe.name}</Typography>
+            <Typography variant="body1">Ingredients: {recipe.ingredients.join(", ")}</Typography>
+            <Button variant="outlined" component={Link} href={`/recipes/${recipe.id}`} sx={{ mt: 2 }}>
+              View Full Recipe
+            </Button>
+          </Box>
+        ) : (
+          <Typography>No recipe suggestions available. Try adding more items to your pantry.</Typography>
+        )}
+      </Box>
+      <CameraSection onCapture={handleCapture} />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        message={snackbar.message}
+      />
+    </Box>
   );
 }
+
+// Helper function to convert a file to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = error => reject(error);
+  });
+}
+
 // File: app/pantry/[id]/page.js
 'use client';
 
@@ -747,8 +932,8 @@ export default async function Pantry() {
 
 import { useState, useEffect } from "react";
 import { getPantryItems } from "@/lib/pantryService";
-import { getRecipeSuggestion } from "@/lib/openAI";
-import RecipeDetail from "@/components/RecipeDetail";
+import { getRecipeSuggestions } from "@/lib/openAI";
+import RecipeDetail from "@/components/RecipeDetails";
 import { Typography, Box, CircularProgress } from "@mui/material";
 
 export default function Recipes() {
@@ -829,6 +1014,43 @@ export default function RemoveItem() {
     </div>
   );
 }
+// File: app/theme.js
+'use client';
+
+import { createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#FF6600',
+    },
+    secondary: {
+      main: '#FFA366',
+    },
+    background: {
+      default: '#F5F5F5',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#333333',
+    },
+  },
+  typography: {
+    fontFamily: 'Poppins, sans-serif',
+    h4: {
+      fontWeight: 700,
+    },
+    button: {
+      textTransform: 'none',
+    },
+  },
+  shape: {
+    borderRadius: 8,
+  },
+});
+
+export default theme;
+
 // File: app/update-item/page.js
 'use client';
 
@@ -862,10 +1084,27 @@ export default function UpdateItem() {
   );
 }
 // File: styles/globals.css
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+:root {
+  --primary-color: #FF6600;
+  --secondary-color: #FFA366;
+  --background-color: #F5F5F5;
+  --text-color: #333333;
+  --card-background: #FFFFFF;
+}
+
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  height: 100vh;
 }
 
 .layout {
@@ -874,9 +1113,10 @@ export default function UpdateItem() {
 }
 
 .sidebar {
-  width: 200px;
-  background-color: #f0f0f0;
+  width: 250px;
+  background-color: var(--card-background);
   padding: 20px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar ul {
@@ -884,38 +1124,61 @@ export default function UpdateItem() {
 }
 
 .sidebar li {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.sidebar a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.sidebar a:hover {
+  color: var(--primary-color);
 }
 
 .content {
   flex-grow: 1;
-  padding: 20px;
+  padding: 30px;
 }
 
 header {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+header h1 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  color: var(--text-color);
+  font-size: 1.1rem;
 }
 
 footer {
   text-align: center;
-  padding: 10px;
-  background-color: #f0f0f0;
-}
-
-body {
-  background-color: #f5f5f5;
+  padding: 20px;
+  background-color: var(--card-background);
+  color: var(--text-color);
+  font-size: 0.9rem;
 }
 
 .MuiPaper-root {
-  background-color: #ffffff;
+  background-color: var(--card-background);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
 .MuiTypography-h4 {
-  color: #ff6600;
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
 .MuiTypography-subtitle1 {
-  color: #666666;
+  color: var(--text-color);
 }
 
 ul, ol {
@@ -925,3 +1188,74 @@ ul, ol {
 li {
   margin-bottom: 8px;
 }
+
+.MuiButton-root {
+  text-transform: none;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.MuiButton-contained {
+  background-color: var(--primary-color);
+}
+
+.MuiButton-contained:hover {
+  background-color: var(--secondary-color);
+}
+
+.MuiTextField-root {
+  margin-bottom: 16px;
+}
+
+.MuiInputLabel-root {
+  color: var(--text-color);
+}
+
+.MuiOutlinedInput-root {
+  border-radius: 4px;
+}
+
+.MuiOutlinedInput-notchedOutline {
+  border-color: var(--primary-color);
+}
+
+/* Add these styles to your existing global.css */
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#__next {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 30px;
+}
+
+footer {
+  margin-top: auto;
+}
+
